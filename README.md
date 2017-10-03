@@ -16,6 +16,6 @@ $ export DEBUG=main.* # optional
 ## Usage
 
 ~~~sh
-$ node sync_apis.js
-$ node sync_consumers.js
+$ node sync_apis.js     # copies over apis/plugins
+$ node sync_consumers.js # copies over consumers/keys/hmac
 ~~~
