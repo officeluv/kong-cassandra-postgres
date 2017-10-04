@@ -108,6 +108,43 @@ const createConsumerHmac = async (consumer, hmac) => {
     return resp.body;
 };
 
+const createOrUpdateAcls = async (consumer) => {
+    const respOld = await kongOld({
+        method: 'GET',
+        url:    '/consumers/' + consumer.username + '/acls?size=10000'
+    });
+    debug('Found acls for consumer: %j', respOld.body);
+    const resp = await kongNew({
+        method: 'GET',
+        url:    '/consumers/' + consumer.username + '/acls?size=10000'
+    });
+    const extinct = respOld.body.data
+        .filter(c => {
+            return (resp.body.data || [])
+                .filter(cc => c.group === cc.group).length < 1;
+        });
+    for (let i = extinct.length - 1; i >= 0; i--) {
+        // This for loop is to avoid DOSing the server
+        await createConsumerAcl(consumer, extinct[i]);
+    }
+};
+
+const createConsumerAcl = async (consumer, acl) => {
+    const options = {
+        method: 'POST',
+        url:    '/consumers/' + consumer.username + '/acls',
+        body: {
+            group:   acl.group,
+        }
+    };
+    if (dry) {
+        debug('would have created consumer acl: %j', options.body);
+        return {};
+    }
+    const resp = await kongNew(options);
+    return resp.body;
+};
+
 const createOrUpdateConsumers = async () => {
     const oldConsumersResp = await kongOld({
         url: '/consumers?size=10000',   // TODO: This is a hack
@@ -125,6 +162,10 @@ const createOrUpdateConsumers = async () => {
     for (let i = oldConsumers.length - 1; i >= 0; i--) {
         // This for loop is to avoid DOSing the server
         await createOrUpdateApiKey(oldConsumers[i]);
+    }
+    for (let i = oldConsumers.length - 1; i >= 0; i--) {
+        // This for loop is to avoid DOSing the server
+        await createOrUpdateAcls(oldConsumers[i]);
     }
 };
 
