@@ -16,6 +16,8 @@ const createConsumer = async (consumer) => {
     if (dry) {
         debug('would have created consumer: %j', options.body);
         return {};
+    } else {
+        debug('creating consumer: %j', options.body);
     }
     const resp = await kongNew(options);
     return resp.body;
@@ -86,6 +88,8 @@ const createConsumerApiKey = async (consumer, key) => {
     if (dry) {
         debug('would have created consumer key: %j', options.body);
         return {};
+    } else {
+        debug('creating consumer key: %j', options.body);
     }
     const resp = await kongNew(options);
     return resp.body;
@@ -103,6 +107,8 @@ const createConsumerHmac = async (consumer, hmac) => {
     if (dry) {
         debug('would have created consumer hmac: %j', options.body);
         return {};
+    } else {
+        debug('creating consumer hmac: %j', options.body);
     }
     const resp = await kongNew(options);
     return resp.body;
@@ -140,6 +146,8 @@ const createConsumerAcl = async (consumer, acl) => {
     if (dry) {
         debug('would have created consumer acl: %j', options.body);
         return {};
+    } else {
+        debug('creating consumer acl: %j', options.body);
     }
     const resp = await kongNew(options);
     return resp.body;
